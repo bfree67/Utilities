@@ -10,13 +10,14 @@ from pykml import parser
 import pandas as pd
 from zipfile import ZipFile
 
-filename1 = 'mic_intersections.kmz'
+kmz_name = 'mic_intersections.kmz'
 
-kmz = ZipFile(filename1, 'r')
-kml = kmz.open('doc.kml', 'r')
+### open KMZ file and extract into KML_folder
+with ZipFile(kmz_name,'r') as zip_ref:
+    zip_ref.extractall('KML_Folder')
 
-#####
-filename= 'mic_intersections.kml'
+##### open KML file in the KML folder - Google will always store as doc.kml
+filename= 'KML_folder/doc.kml'
 
 with open(filename) as f:
     folder = parser.parse(f).getroot().Document.Folder
