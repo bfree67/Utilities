@@ -31,20 +31,22 @@ df2 = pd.DataFrame() # create blank dataframe to use for concatenating
 
 ranklist = [] #initialize list to capture Rank column names
 
-for i in range(len(paths)):     #loop over different runs in different folders
-    file_path = paths[i]
-    
-    # set variable for years of runs
-    if file_path == fp1:
-        yr = 1
-    if file_path == fp2:
-        yr = 3
-    if file_path == fp3:
-        yr = 10
 
-    for chem_name in range(ch):
-        
-        chem = chem_type[chem_name]
+for chem_name in range(ch):    # select chemical and loop  
+    chem = chem_type[chem_name]
+    
+    for i in range(len(paths)):     #loop over different runs in different folders
+        file_path = paths[i]
+    
+        # set variable for years of runs
+        if file_path == fp1:
+            yr = 1
+        if file_path == fp2:
+            yr = 3
+        if file_path == fp3:
+            yr = 10
+
+
         os.chdir(file_path + chem) ## set filepath and folder
     
         for t in range (tave):
