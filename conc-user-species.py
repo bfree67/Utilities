@@ -15,11 +15,11 @@ import pandas as pd
 from pandas import read_csv
 from pandas import ExcelWriter
 
-#file paths for different runs
-fp1 = 'C:\\TARS\AAAActive\\Qatar Airshed Study Jul 2017\\AQMIS Runs\\2017Run\\2017_all_MIC_post\\'
-fp2 = 'C:\\TARS\\AAAActive\\Qatar Airshed Study Jul 2017\\AQMIS Runs\\3yr-all-MIC\\3yr-all-MIC_post\\'
+#file paths for different runs (add extra \ to tree separators for Python)
+fp2 = 'C:\\TARS\\AAAActive\\Qatar Airshed Study Jul 2017\\AQMIS Runs\\3yrCurrent\\3yr_current_post\\'
+fp1 = 'C:\\TARS\\AAAActive\\Qatar Airshed Study Jul 2017\\AQMIS Runs\\3yr-all-MIC\\3yr-all-MIC_post\\'
 fp3 = 'C:\\TARS\\AAAActive\\Qatar Airshed Study Jul 2017\\AQMIS Runs\\10yr-all-MIC-facilities_post\\'
-paths = [fp1, fp2, fp3]  # make filepath list
+paths = [fp2]#, fp2, fp3]  # make filepath list
 
 #make variables of chemicals
 nh3 = 'NH3'; hf = '7664393'; h2s = '7783064'; nox = 'NOX'; pm10 = 'PM10-PRI';
@@ -34,7 +34,7 @@ tave = len(time_ave)
 
 # set Excel output file pathway
 active_dir = 'C:\\TARS\\AAAActive\\Qatar Airshed Study Jul 2017\\AQMIS Runs\\'
-writer = ExcelWriter('hotspots3.xlsx')
+writer = ExcelWriter('hotspots3_current.xlsx')
 
 for chem_name in range(ch):    # select chemical and loop  
     chem = chem_type[chem_name]
