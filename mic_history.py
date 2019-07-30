@@ -56,15 +56,44 @@ for chem in chem_type:
     fig, axs = plt.subplots(2)
     
     fig.suptitle('Growth of annual ' + chem + ' emissions')
+    fig.set_figheight(5)
+    fig.set_figwidth(8)
     
     # cumulative plot
     axs[0].plot(years, cum)
-    axs[0].set_yscale('log')
+    axs[0].set_yscale('linear')
     axs[0].set_ylabel('Tonnes (cum.)')
+    axs[0].axis([1958, 2020, 100, round(cum.max(),-3) + 2000])
     
     # delta plot
     axs[1].bar(years, delta)
     axs[1].set_yscale('log')
     axs[1].set_ylabel('Tonnes (difference)')
+    axs[1].axis([1958, 2020, 1, 10000])
     plt.show()
-    fig.savefig(chem + '.svg', format='svg', dpi=1200)
+    fig.savefig(chem + '.svg', format='svg', dpi=1200) ### save figure to file
+    
+# Create figure and plot a stem plot with the date
+built = np.zeros(len(years))
+for m in range(len(df)):
+    
+    for yr in years:
+        
+        if int(df.Year[m]) == yr:
+            built[yr-1958] = 1.
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+fig.set_figheight(5)
+fig.set_figwidth(8)           
+plt.bar(years,built, color = 'red')
+plt.ylim(0, 2)
+ax.yaxis.set_visible(False)
+plt.show()
+#fig.savefig('mic_timeline.svg', format='svg', dpi=1200) ### save figure to file
+            
+            
+            
+            
+
+
