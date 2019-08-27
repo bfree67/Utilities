@@ -11,10 +11,6 @@ Reads column headers of first old template and changes headers of all
 other files to ensure standardized column headers. Just have to update the
 first file.
 
-Updated 27 Aug 2019
-Added ability to load original Blank Template, strip off headers, load data
-then add headers to final worksheet.
-
 @author: Brian, Python 3.5
 """
 import glob
@@ -23,7 +19,6 @@ import os
 
 current_path = os.getcwd()  # get current working path to save later
 
-# a function to link the air quality zones based on the facility
 def add_aqz(x):
     # Merge AQZ from new_fac
     df_1 = x[['Facility Name']]
@@ -36,7 +31,6 @@ def add_aqz(x):
     
     return new_aqz
 
-# a function to generate the header from the blank template to add later 
 def new_header(df):
     hd_list = list(df) # get column headers (name, unknown,,,,,)
     for i in range(1,len(hd_list)):
@@ -49,7 +43,6 @@ def new_header(df):
     df3 = df3.reset_index()
     return df3.drop('index', axis=1)
 
-# function to reset index and then drop the added index column
 def drop_index(df):
     df = df.reset_index()
     return df.drop('index', axis=1)
@@ -96,20 +89,29 @@ for file in glob.glob("*.xlsx"):
     
     if i == 0:
         df_fac = xl.parse('Facility Information')
+        df_fac_hd = list(df_fac)  # get the column headers from the 1st file
+        
         df_rp = xl.parse('Release Points')
-        df_source = xl.parse('Source Information')
+        df_rp_hd = list(df_rp)
+        
+        df_source = xl.parse('Source Information')     
         df_emissions = xl.parse('Emissions')
+
         i += 1     
     
     else:
         df_fac = pd.concat([df_fac, xl.parse('Facility Information')], sort = False)
+       # df_fac.columns = df_fac_hd #rename all other file column headers to ensure they are standardized
+        
         df_rp = pd.concat([df_rp, xl.parse('Release Points')], sort = False)
-        df_source = pd.concat([df_source, xl.parse('Source Information')], sort = False)
+        #df_rp.columns = df_rp_hd
+        
+        df_source = pd.concat([df_source, xl.parse('Source Information')], sort = False)      
         df_emissions = pd.concat([df_emissions, xl.parse('Emissions')], sort = False)
 
-    print('Importing file: ' + file)
+    
+    print(file)
 
-print('\nA total of ' + str(len(txtfiles)) + ' files loaded.')
 # make sub dataframe with AQZ
 df_zones = df_fac[['Facility Name', 'AQZ']]
 df_zones = drop_index(df_zones)
@@ -122,10 +124,8 @@ new_names = new_template2.sheet_names
 # global constants for country and company
 country = 'Kuwait'
 company = 'MEW'
-
-comp_chk = input('\nThe COMPANY value is ' + company + '. Is that ok? (y/n) ' )
-if comp_chk == 'n':
-    company = input('Which COMPANY should be used? ')
+start_date = '01/01/2016'
+end_date = '12/31/2016'
 
 # ****************************************
 # * New Facility sheet
@@ -144,6 +144,7 @@ new_fac['SIC'] = df_fac['SIC']
 
 new_fac = pd.concat((new_fac_hd, new_fac), axis = 0)
 new_fac = drop_index(new_fac)
+
 
 # ****************************************
 # * New Release Points sheet
@@ -269,9 +270,9 @@ new_period['Emission Unit ID'] = df_source['Emission Unit']
 new_period['Facility Name'] = df_source['Facility Name']
 new_period['Country'] = country
 new_period['Reporting Period'] = 'Annual'
-new_period['Start Date'] = ''
-new_period['End Date'] = ''
-new_period['Operation Type'] = ''
+new_period['Start Date'] = start_date
+new_period['End Date'] = end_date
+new_period['Operation Type'] = 'Routine'
 new_period['Emission Category'] = 'Actual'
 new_period['Emission Type'] = 'ENTIRE PERIOD'
 new_period['Period Description'] = ''
@@ -327,13 +328,13 @@ new_emissions['EF Reliability Indicator'] = df_source['
 new_emissions['Rule Effectiveness ['%']'] = df_source['
 new_emissions['Rule Effectiveness Method'] = df_source['
 new_emissions['Emissions Comment'] = df_source['
-
+'''
 # Merge AQZ from new_fac
 new_emissions = add_aqz(new_emissions)
 
 new_emissions = pd.concat((new_emissions_hd, new_emissions), axis = 0)
 new_emissions = drop_index(new_emissions)
-'''
+
 
 # **************************************************
 # Save in new AQMIS format as xlsx 
