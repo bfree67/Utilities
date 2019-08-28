@@ -67,6 +67,15 @@ def check_rp(df_rp):
         
         return df_rp
 
+# function to check if column exists in old template    
+def col_check(old_df, col_ck, new_df):
+    if col_ck in old_df.columns:
+        new_df[col_ck] = old_df[col_ck]    
+    else:
+        new_df[col_ck] = ''
+    return new_df[col_ck]
+    
+
 # ******************* make new headers ****************************
     
 # location of blank template with only column headers    
@@ -291,21 +300,21 @@ new_period['Operation Type'] = 'Routine'
 new_period['Emission Category'] = 'Actual'
 new_period['Emission Type'] = 'ENTIRE PERIOD'
 new_period['Period Description'] = ''
-new_period['Calculation Data Year'] = ''
+new_period['Calculation Data Year'] = '2016'
 new_period['Comments'] = ''
-new_period['Throughput Value'] = ''
-new_period['Throughput Unit'] = ''
-new_period['Material'] = ''
-new_period['Material Process Type'] = ''
+new_period['Throughput Value'] = df_emissions['Fuel Use']
+new_period['Throughput Unit'] = df_emissions['Fuel Use (Units)']
+new_period['Material'] = df_emissions['Fuel Type']
+new_period['Material Process Type'] = 'PROCESS MATERIAL USED (INPUT)'
 new_period['Throughput Calculation Source'] = ''
 new_period['Average Days per Week'] = ''
 new_period['Average Weeks per Period'] = ''
 new_period['Average Hours per Day'] = ''
-new_period['Hours per Period'] = ''
+new_period['Hours per Period'] =  df_emissions['Op Hours']
 new_period['Heat Content'] = ''
-new_period['[Million BTU Per]'] = ''
-new_period['Ash Content [mass %]'] = ''
-new_period['Sulfur Content [mass %]'] = ''
+new_period['[Million BTU Per]'] = col_check(df_emissions, '[Million BTU Per]', new_period)
+new_period['Ash Content [mass %]'] = col_check(df_emissions, 'Ash Content [mass %]', new_period)
+new_period['Sulfur Content [mass %]'] = col_check(df_emissions, 'Sulfur Content [mass %]', new_period)
 
 # Merge AQZ from new_fac
 new_period = add_aqz(new_period)
