@@ -11,6 +11,10 @@ Reads column headers of first old template and changes headers of all
 other files to ensure standardized column headers. Just have to update the
 first file.
 
+Updated 28 Aug 2019 - Added check to see if column headers in Release Point
+are in degrees or deg and exit temp is K or C. Added check to see if there is an
+active or inactive added column
+
 @author: Brian, Python 3.5
 """
 import glob
@@ -19,6 +23,7 @@ import os
 
 current_path = os.getcwd()  # get current working path to save later
 
+# function to merge AQZ with facility in other worksheets
 def add_aqz(x):
     # Merge AQZ from new_fac
     df_1 = x[['Facility Name']]
@@ -31,6 +36,7 @@ def add_aqz(x):
     
     return new_aqz
 
+# function to add proper header in new template format after data has been remapped
 def new_header(df):
     hd_list = list(df) # get column headers (name, unknown,,,,,)
     for i in range(1,len(hd_list)):
@@ -43,9 +49,23 @@ def new_header(df):
     df3 = df3.reset_index()
     return df3.drop('index', axis=1)
 
+# function to reset dataframe index and drop added index column
 def drop_index(df):
     df = df.reset_index()
     return df.drop('index', axis=1)
+
+# function to check the release point sheet in the old format for common headers
+def check_rp(df_rp):
+        if 'Latitude [decimal degrees]' in df_rp:
+            df_rp = df_rp.rename(columns = {'Latitude [decimal degrees]':'Latitude [decimal deg]'})
+        
+        if 'Longitude [decimal degrees]' in df_rp:
+            df_rp = df_rp.rename(columns = {'Longitude [decimal degrees]':'Longitude [decimal deg]'})
+            
+        if 'Exit Temperature [K]' in df_rp:
+            df_rp = df_rp.rename(columns = {'Exit Temperature [K]':'Exit Temperature [C]'})
+        
+        return df_rp
 
 # ******************* make new headers ****************************
     
@@ -72,7 +92,6 @@ new_apport_hd = new_header(new_apport_hd)
 new_period_hd = new_header(new_period_hd)
 new_emissions_hd = new_header(new_emissions_hd)
 
-
 # **************** make templates **************************************
 
 txtfiles = []
@@ -89,23 +108,15 @@ for file in glob.glob("*.xlsx"):
     
     if i == 0:
         df_fac = xl.parse('Facility Information')
-        df_fac_hd = list(df_fac)  # get the column headers from the 1st file
-        
-        df_rp = xl.parse('Release Points')
-        df_rp_hd = list(df_rp)
-        
+        df_rp = check_rp(xl.parse('Release Points')) # uses check_rp function to standardize headers
         df_source = xl.parse('Source Information')     
         df_emissions = xl.parse('Emissions')
 
         i += 1     
     
     else:
-        df_fac = pd.concat([df_fac, xl.parse('Facility Information')], sort = False)
-       # df_fac.columns = df_fac_hd #rename all other file column headers to ensure they are standardized
-        
-        df_rp = pd.concat([df_rp, xl.parse('Release Points')], sort = False)
-        #df_rp.columns = df_rp_hd
-        
+        df_fac = pd.concat([df_fac, xl.parse('Facility Information')], sort = False)    
+        df_rp = pd.concat([df_rp, check_rp(xl.parse('Release Points'))], sort = False)        
         df_source = pd.concat([df_source, xl.parse('Source Information')], sort = False)      
         df_emissions = pd.concat([df_emissions, xl.parse('Emissions')], sort = False)
 
@@ -145,7 +156,6 @@ new_fac['SIC'] = df_fac['SIC']
 new_fac = pd.concat((new_fac_hd, new_fac), axis = 0)
 new_fac = drop_index(new_fac)
 
-
 # ****************************************
 # * New Release Points sheet
 new_rp = new_template2.parse('Release Points')
@@ -166,10 +176,9 @@ new_rp['UTM-X [m]'] = ''
 new_rp['UTM-Y [m]'] = ''
 new_rp['UTM Zone'] = ''
 new_rp['Source ID'] = df_rp['Point Of Release']
-new_rp['Description'] = df_rp['Comment']
+new_rp['Description'] = ''
 new_rp['Base Elevation [m]'] = df_rp['Base Elevation [m]']
-new_rp['Active'] = 'T'
-new_rp['Notes'] = ''
+new_rp['Notes'] = df_rp['Comment']
 new_rp['Flow Rate [m^3/s]'] = ''
 new_rp['Fugitive Type'] = ''
 new_rp['Release Height [m]'] = df_rp['Area Release Height [m]']
@@ -181,7 +190,13 @@ new_rp['Length of Y Side [m]'] = df_rp['Area Length Side Y [m]']
 new_rp['Orientation Angle [deg]'] = df_rp['Area Orientation Angle [deg]']
 new_rp['Projected Datum'] = ''
 
-# Merge AQZ from new_fac
+# see if there is an active column in the work sheet
+if 'Active' in df_rp.columns:
+    new_rp['Active'] = df_rp['Active']    
+else:
+    new_rp['Active'] = 'T'
+
+# Merge AQZ from new_fac by calling the add_aqz function
 new_rp = add_aqz(new_rp)
 
 new_rp = pd.concat((new_rp_hd, new_rp), axis = 0)
