@@ -21,7 +21,7 @@ import glob
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
-import numpy as np
+from scipy import stats
 
 
 current_path = os.getcwd()  # get current working path to save later
@@ -45,6 +45,8 @@ def make_stats(so2):
     return pd.concat([stats, stats90], axis = 1, sort = False)
     
 def scenario_dev(chem):
+    
+    t_crit = stats.t.ppf(.9,df=11) # set confidence interval (90% = 0.9)
     chemical = chem.groupby(['Source Code'])
     scenarios = []
     for i, (chemical_name, chemical_gdf) in enumerate(chemical):
@@ -54,7 +56,7 @@ def scenario_dev(chem):
         
         std_chem = float(chemical_gdf.std())
         
-        t_var = float((2*normal) + (std_chem * 1.363/3.464))
+        t_var = float((2*normal) + (std_chem * t_crit/3.464))
         
         abnormal = round((chemical_gdf.loc[(chemical_gdf['c'] > t_var)]).mean(),3)
         
