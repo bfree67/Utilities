@@ -20,6 +20,9 @@ active or inactive added column
 import glob
 import pandas as pd
 import os
+import time
+
+version = '2.903'
 
 current_path = os.getcwd()  # get current working path to save later
 
@@ -74,10 +77,16 @@ def col_check(old_df, col_ck, new_df):
     else:
         new_df[col_ck] = ''
     return new_df[col_ck]
-    
+
+# ***************** START PROGRAM *********************************
+
+print('*************************************************\n')
+print('       AQMIS Old to New Template Utility  ')
+print('                Version ' + version + '\n')
+print('*************************************************\n')
 
 # ******************* make new headers ****************************
-    
+
 # location of blank template with only column headers    
 new_file = 'C:\\TARS\\AAALakes\\Kuwait AQMIS\\Blank_Template.xlsx'    
 new_template = pd.ExcelFile(new_file)
@@ -108,6 +117,7 @@ agg = pd.DataFrame
 i = 0 # counter to begin with
 
 # merge the excel files into one file by reading all excel files in the folder
+print('Importing data files...')
 for file in glob.glob("*.xlsx"):
     txtfiles.append(file)
     
@@ -131,6 +141,7 @@ for file in glob.glob("*.xlsx"):
 
     
     print(file)
+print(str(len(txtfiles)) + ' imported. \n')
 
 # make sub dataframe with AQZ
 df_zones = df_fac[['Facility Name', 'AQZ']]
@@ -367,7 +378,9 @@ save_df = input('\nSave new AQMIS Template for ' + company +'? (y/n) ')
 #new_path = 'C:\TARS\AAALakes\Kuwait AQMIS\'
 if save_df == 'y':   
     os.chdir("\TARS\AAALakes\Kuwait AQMIS") # reset to new folder path 
-    writer = pd.ExcelWriter('AQMIS_new_format_'+company+'.xlsx')
+    time_stamp = str(int(time.time()))[-6:] # add unique stamp to file name
+    
+    writer = pd.ExcelWriter('AQMIS_new_format_'+company+'_'+time_stamp+'.xlsx')
     
     # write worksheets. Save w/o index or column header
     new_fac.to_excel(writer, sheet_name = 'Facilities', index = False, header = False)
