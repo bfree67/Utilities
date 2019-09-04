@@ -64,11 +64,12 @@ def make_stats(so2):
 
 def aqmis_col(chem_name, chem_list): # chem_name is a text sting and chem_list is a 2 column list
     
-    df_norm = pd.DataFrame(chem_list)
-    df_norm.columns = ['Emission Unit ID', 'Emission Value']
+    df = pd.DataFrame(chem_list)
+    df.columns = ['Emission Unit ID', 'Emission Value']
 
-    df_norm['Pollutant'] = chem_id[chem_name]
-    df_norm['Description'] = chem_desc[chem_name]
+    df['Pollutant'] = chem_id[chem_name]
+    df['Description'] = chem_desc[chem_name]
+    df['Units'] = units
     
     return df_norm
     
