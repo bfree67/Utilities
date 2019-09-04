@@ -71,7 +71,7 @@ def aqmis_col(chem_name, chem_list): # chem_name is a text sting and chem_list i
     df['Description'] = chem_desc[chem_name]
     df['Units'] = units
     
-    return df_norm
+    return df
     
     
 def scenario_dev(chem_name, chem):   # chem_name is a text sting and chem is a dataframe
@@ -177,7 +177,7 @@ for file in file_list:
 
 df_fac.columns = ['Source Code','Month', 'SO2', 'NOX', 'VOC', 'PM10', 'NH3', 'H2S', 'HF']      
 
-print(str(len(file_list)) + ' file(s) imported.\n')
+print(str(len(file_list)) + ' file(s) imported.')
 
 df_fac = df_fac.sort_values(['Source Code', 'Month'])
 so2 = df_fac[['Source Code', 'Month', 'SO2']]
@@ -208,7 +208,7 @@ stats2.columns = ['SO2 Sum', 'SO2 Ave', 'SO2 Std', 'SO2 Max', 'SO2 Min', 'SO2 CI
 
 # *********** plot histograms ***************************************
 
-plot_question = input('\nPlot histograms for ' + company +'sources? (y/n) ')
+plot_question = input('Plot histograms for ' + company +'sources? (y/n) ')
 
 if plot_question == 'y': 
     plot_hist('SO2', so2)
@@ -260,7 +260,7 @@ df_scene_abnorm = df_scene_abnorm.dropna()
 # ************ Save worksheets ***************************
 
 # Save in new AQMIS format as xlsx 
-save_df = input('\nSave new sheet for ' + company +'? (y/n) ')
+save_df = input('Save new scenarios for ' + company +'? (y/n) ')
 
 #new_path = 'C:\TARS\AAALakes\Kuwait AQMIS\'
 if save_df == 'y':   
@@ -270,8 +270,8 @@ if save_df == 'y':
     writer = pd.ExcelWriter('Annual_'+company+'_'+time_stamp+'.xlsx')
     
     # write worksheets. Save w/o index or column header
-    df_scene_norm.to_excel(writer, sheet_name = 'Normal', index = True, header = False)
-    df_scene_abnorm.to_excel(writer, sheet_name = 'Abnormal', index = True, header = False)
+    df_scene_norm.to_excel(writer, sheet_name = 'Normal', index = False, header = True)
+    df_scene_abnorm.to_excel(writer, sheet_name = 'Abnormal', index = False, header = True)
     stats2.to_excel(writer, sheet_name = 'Stats', index = True, header = True)
 
     writer.save()
