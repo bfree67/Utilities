@@ -40,12 +40,12 @@ df['coordinates'] = cordi
 df['Longitude'], df['Latitude'],df['value'] = zip(*df['coordinates'].apply(lambda x: x.split(',', 2)))
 
 ### make new dataframe with basic columns
-dfa = df.filter(['place_name', 'Longitude', 'Latitude'],axis=1)
+dfa = df.filter(['place_name', 'Latitude', 'Longitude'],axis=1)
 
 ### convert objects to numeric format
 dfa["Longitude"] = pd.to_numeric(dfa.Longitude, errors='coerce')
 dfa["Latitude"] = pd.to_numeric(dfa.Latitude, errors='coerce')
 
 ### save to Excel file
-dfa.to_excel('intersections.xlsx')
+dfa.to_excel('intersections.xlsx', index = False)
 
