@@ -4,12 +4,14 @@ Created on Mon Mar 25 10:03:38 2019
 
 @author: Brian
 Original script from https://gist.github.com/nishadhka/3ba801ca980da5b76004631c1935f604
-Extract Lat/Long coords from a KML file
+Extract Lat/Long coords from a KMZ file. Save coordinates in decimal degrees on Google Earth
+Saves converted coordinates in Excel same folder
 """
 from pykml import parser
 import pandas as pd
 from zipfile import ZipFile
 
+# Name of KMZ file
 kmz_name = 'mic_intersections.kmz'
 
 ### open KMZ file and extract into KML_folder
