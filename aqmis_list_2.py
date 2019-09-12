@@ -22,7 +22,12 @@ import pandas as pd
 import os
 import time
 
-version = '2.903'
+version = '2.912'
+# global constants for country and company
+country = 'Kuwait'
+company = 'KNPC'
+start_date = '01/01/2016'
+end_date = '12/31/2016'
 
 current_path = os.getcwd()  # get current working path to save later
 
@@ -148,15 +153,9 @@ df_zones = df_fac[['Facility Name', 'AQZ']]
 df_zones = drop_index(df_zones)
 
 # location of blank template with only column headers    
-new_file = 'C:\\TARS\\AAALakes\\Kuwait AQMIS\\Blank_Template.xlsx'    
+# use new_file from before   
 new_template2 = pd.ExcelFile(new_file)
 new_names = new_template2.sheet_names
-
-# global constants for country and company
-country = 'Kuwait'
-company = 'MEW'
-start_date = '01/01/2016'
-end_date = '12/31/2016'
 
 # ****************************************
 # * New Facility sheet
@@ -168,8 +167,8 @@ new_fac['Facility Name'] = df_fac['Facility Name']
 new_fac['Country'] = 'Kuwait'
 new_fac['Air Quality Zone'] = df_fac['AQZ']
 new_fac['Company Name'] = 'MEW'
-new_fac['Latitude [deg]'] = df_fac['Latitude [decimal deg]']
-new_fac['Longitude [deg]'] = df_fac['Longitude [decimal deg]']
+new_fac['Latitude [deg]'] = df_fac['Latitude']
+new_fac['Longitude [deg]'] = df_fac['Longitude']
 new_fac['Governorate'] = df_fac['Location']
 new_fac['SIC'] = df_fac['SIC']
 
@@ -190,17 +189,17 @@ new_rp['Stack Height [m]'] = df_rp['Release Height [m]']
 new_rp['Stack Diameter [m]'] = df_rp['Diameter [m]']
 new_rp['Exit Temperature [C]'] = df_rp['Exit Temperature [C]']
 new_rp['Exit Velocity [m/s]'] = df_rp['Exit Velocity [m/s]']
-new_rp['Latitude [deg]'] = df_rp['Latitude [decimal deg]']
-new_rp['Longitude [deg]'] = df_rp['Longitude [decimal deg]']
+new_rp['Latitude [deg]'] = df_rp['Latitude']
+new_rp['Longitude [deg]'] = df_rp['Longitude']
 new_rp['UTM-X [m]'] = ''
 new_rp['UTM-Y [m]'] = ''
 new_rp['UTM Zone'] = ''
 new_rp['Source ID'] = df_rp['Point Of Release']
-new_rp['Description'] = ''
-new_rp['Base Elevation [m]'] = df_rp['Base Elevation [m]']
+new_rp['Description'] = df_rp['Comment']
+new_rp['Base Elevation [m]'] = df_rp['Base Elevation']
 new_rp['Notes'] = df_rp['Comment']
 new_rp['Flow Rate [m^3/s]'] = ''
-new_rp['Fugitive Type'] = ''
+new_rp['Fugitive Type'] = 'Area Fugitive Source' # make it general for all
 new_rp['Release Height [m]'] = df_rp['Area Release Height [m]']
 new_rp['Initial Lateral Dimension [m]'] = df_rp['Volume Initial Lateral Dimension [m]']
 new_rp['Initial Vertical Dimension [m]'] = df_rp['Area Initial Vertical Dimension [m]']
@@ -208,7 +207,7 @@ new_rp['Horizontal Area [sq. m]'] = ''
 new_rp['Length of X Side [m]'] = df_rp['Area Length Side X [m]']
 new_rp['Length of Y Side [m]'] = df_rp['Area Length Side Y [m]']
 new_rp['Orientation Angle [deg]'] = df_rp['Area Orientation Angle [deg]']
-new_rp['Projected Datum'] = ''
+new_rp['Projected Datum'] = 'WGS84'
 
 # see if there is an active column in the work sheet
 if 'Active' in df_rp.columns:
