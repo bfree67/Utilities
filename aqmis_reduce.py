@@ -4,6 +4,7 @@ Created on 18 Oct 2019
 
 Utility to reduce sources based on emission contributions. Takes complete Facility Template
 and removes unused release points and emission units.
+Fixed bug that cut off first row of data.
 
 @author: Brian, Python 3.5
 """
@@ -12,7 +13,7 @@ import pandas as pd
 import os
 import time
 
-version = '1.1018'
+version = '1.1021'
 # global constants for country and company
 
 
@@ -35,7 +36,6 @@ def new_header2(df):
     #df.columns = df.iloc[0] # make new column headers from first row
     return df.iloc[0:2]
     
-
 # function to reset dataframe index and drop added index column
 def drop_index(df):
     df = df.reset_index()
@@ -47,7 +47,7 @@ def strip_data(x_string):
     
     # strip header and name columns
     new_sheet.columns = new_sheet.iloc[0]
-    return new_sheet.iloc[3:len(new_sheet)]
+    return new_sheet.iloc[2:len(new_sheet)]
 
 def reconstruct(new_sheet_hd, new_sheet):
     new_sheet = pd.concat((new_sheet_hd, new_sheet), axis = 0)
@@ -140,6 +140,8 @@ eu_list = list(es1['Unit ID'])
 
 #get other emissions from the same emissions units
 esn = new_emissions.loc[new_emissions['Pollutant'] != 'Volatile Organic Compounds']
+
+# set up other sheets to find only unit IDs
 per = new_period
 app = new_apport
 pro = new_pro
