@@ -5,6 +5,7 @@ Created on 18 Oct 2019
 Utility to reduce sources based on emission contributions. Takes complete Facility Template
 and removes unused release points and emission units.
 Fixed bug that cut off first row of data.
+And stupid shit...this one works
 
 @author: Brian, Python 3.5
 """
@@ -13,7 +14,7 @@ import pandas as pd
 import os
 import time
 
-version = '1.1021'
+version = '2.1021'
 # global constants for country and company
 
 
@@ -159,13 +160,13 @@ for unit in eu_list:
     app1 = app.loc[app['Unit ID'] == unit]
     new_app = pd.concat((new_app, app1), axis = 0)
     
-    pro1 = pro.loc[app['Unit ID'] == unit]
+    pro1 = pro.loc[pro['Unit ID'] == unit]
     new_process = pd.concat((new_process, pro1), axis = 0)
     
-    eu1 = eu.loc[app['Unit ID'] == unit]
+    eu1 = eu.loc[eu['Unit ID'] == unit]
     new_euts = pd.concat((new_euts, eu1), axis = 0)
     
-    rp1 = rp.loc[app['Unit ID'] == unit]
+    rp1 = rp.loc[rp['Release ID'] == unit]
     new_rpts = pd.concat((new_rpts, rp1), axis = 0)
       
 new_emissions1 = reconstruct(new_emissions_hd, new_es)
