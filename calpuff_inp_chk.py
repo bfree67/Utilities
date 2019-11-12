@@ -16,6 +16,7 @@ format_file = 'SCICHEM_ABNORMAL2.INP'
 src_lines = []
 sources = 0
 
+Tot = 0
 NOX = 0
 VOC = 0
 
@@ -40,12 +41,13 @@ for i in range(len(src_lines)):
     
     if len(a) > 2:
         if a[2] == 'X':
+            Tot += 1
             if a[12] != '0.00':
                 NOX += 1
             if a[13] != '0.00':
                 VOC += 1
                 
-print('NOX sources = ', NOX, 'VOC sources =', VOC)
+print('Total Sources =', Tot, ', NOX sources = ', NOX, ', VOC sources =', VOC)
         
 
 
