@@ -16,9 +16,11 @@ def super_seed(n=1000):
     
     #n is a length of a random list of integers and select one from random
     x_seed = np.random.uniform(0,1000,n).astype(int) # make a list of 100 different random variables
+    np.random.shuffle(x_seed)
     x_index = int(np.random.uniform(n))
     
     np.random.seed(x_seed[x_index]) # second seed
     
 super_seed()
 
+x = np.random.uniform(0,1,10000)
