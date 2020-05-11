@@ -43,7 +43,7 @@ def check_file(file_out):
     return file_out
 
 def save_pollutant(df, analyte):
-    df.columns = yr_col_strings  # change column names
+    #df.columns = yr_col_strings  # change column names
     df = df.replace(0,np.nan)
     df.to_excel(writer, sheet_name = analyte) # save each AMS to separate worksheet
     return
@@ -95,11 +95,26 @@ for file in file_list:
         df_noleap = df_year[mask] #remove leap year hours
         
         ##### add column to analytes
-        df_o3 = pd.concat((df_o3, df_noleap.O3), axis = 1)
-        df_so2 = pd.concat((df_so2, df_noleap.SO2), axis = 1)
-        df_no2 = pd.concat((df_no2, df_noleap.NO2), axis = 1)
-        df_co = pd.concat((df_co, df_noleap.CO), axis = 1)
-        df_pm10 = pd.concat((df_pm10, df_noleap.PM10), axis = 1)
+        if df_noleap.O3.count() > 0:
+            df_col = df_noleap.O3.to_frame()
+            df_col.columns = [str(this_year)]
+            df_o3 = pd.concat((df_o3, df_col), axis = 1)
+        if df_noleap.SO2.count() > 0:
+            df_col = df_noleap.SO2.to_frame()
+            df_col.columns = [str(this_year)]
+            df_so2 = pd.concat((df_so2, df_noleap.SO2), axis = 1)
+        if df_noleap.NO2.count() > 0:
+            df_col = df_noleap.NO2.to_frame()
+            df_col.columns = [str(this_year)]
+            df_no2 = pd.concat((df_no2, df_noleap.NO2), axis = 1)
+        if df_noleap.CO.count() > 0:
+            df_col = df_noleap.CO.to_frame()
+            df_col.columns = [str(this_year)]
+            df_co = pd.concat((df_co, df_noleap.CO), axis = 1)
+        if df_noleap.PM10.count() > 0:
+            df_col = df_noleap.PM10.to_frame()
+            df_col.columns = [str(this_year)]
+            df_pm10 = pd.concat((df_pm10, df_noleap.PM10), axis = 1)
     
     writer.save()  # save by year workbook
     writer.close() # close by year workbook
@@ -110,6 +125,7 @@ writer = pd.ExcelWriter(file_pollutants, engine = 'xlsxwriter')
 
 yr_cols = df_aqi['Date'].dt.year.unique().tolist() # get list of years in data
 yr_col_strings = ["%.0f" % x for x in yr_cols]  # convert number list to strings
+yr_col_strings.remove('2018')
 
 for analyte in parameters:
 
