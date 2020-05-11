@@ -14,6 +14,7 @@ Then save each pollutant by year
 import glob
 import pandas as pd
 import os.path
+import numpy as np
 
 def clean_name(text_list):
     new_list = []
@@ -42,9 +43,10 @@ def check_file(file_out):
     return file_out
 
 def save_pollutant(df, analyte):
-        df.columns = yr_col_strings  # change column names
-        df = df.replace(0,np.nan)
-        df.to_excel(writer, sheet_name = analyte) # save each AMS to separate worksheet
+    df.columns = yr_col_strings  # change column names
+    df = df.replace(0,np.nan)
+    df.to_excel(writer, sheet_name = analyte) # save each AMS to separate worksheet
+    return
     
 file_list = glob.glob('*.xlsx')
 
