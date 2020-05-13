@@ -10,6 +10,7 @@ Merges both and saves
 import glob
 import pandas as pd
 import numpy as np
+import datetime
 
 def clean_name(text_list):
     #### Reformat column names
@@ -76,12 +77,13 @@ for file in file_list:
         df_wrf_dt.columns = ['Date']
         df_wrf_dt = pd.concat((df_wrf_dt, df_wrf[['month', 'day', 'hour']]), axis = 1)
         df_wrf_n = pd.concat((df_wrf_dt, df_wrf[wrf_list[4:len(wrf_list)]]), axis = 1)
-
+        df_wrf_n.drop('rain', axis=1, inplace=True)
+        
 ### merge AMS and WRF data together
 df_merge = df_ams_n.merge(df_wrf_n, left_on='Date', right_on='Date', 
                            suffixes=('_left', '_right'))   
         
-df_merge.to_excel(writer, sheet_name = file[0:15]) # save to Excel
+df_merge.to_excel(writer, sheet_name = file[0:15], index = False) # save to Excel
 writer.save()  # save workbook
 writer.close() # close workbook
 print('\nSaving in file: ' + file_out)
