@@ -10,9 +10,6 @@ Merges both and saves
 import glob
 import pandas as pd
 import numpy as np
-import datetime
-
-
 
 def clean_name(text_list):
     #### Reformat column names
@@ -60,31 +57,33 @@ for file in file_list:
         df_ams = load_ams(file)  
         df_datetime = df_ams[['Date']].apply(pd.to_datetime)
     
-        parameters = ['O3', 'SO2', 'NO2', 'CO', 'PM10', 'PM2.5', 'WD',
-                   'WS', 'TEMP', 'RH']
+        parameters = ['O3', 'SO2', 'NO2', 'CO', 'PM10']
         df_aqi = df_ams[parameters].apply(pd.to_numeric)
-        df_aqi.CO = df_aqi.CO / 1000 # convert CO ug/m3 to mg/m3
+        df_aqi.CO = df_aqi.CO * 1000 # convert CO mg/m3 to ug/m3
         df_aqi = pd.concat((df_datetime, df_aqi), axis = 1) # combine date with parameters
         
         this_year = 2015
         df_ams_n = df_aqi[df_aqi['Date'].dt.year >= this_year] ## select only values in the year
         df_ams_n = df_ams_n.reset_index(drop=True) # reset index for each year
+        df_ams_n = df_ams_n.replace(0,np.nan)
         
     if name_check == 'MET':
         df_wrf = pd.read_excel(file)
-        df_wrf.columns = clean_name(df_wrf.columns.to_list())
-        wrf_list = df_wrf.columns.to_list()
+        df_wrf.columns = clean_name(df_wrf.columns.to_list())  #trim whitespaces in name
+        wrf_list = df_wrf.columns.to_list()  # make list of column nanmes
+        ### convert columns to datetime column
         df_wrf_dt = pd.to_datetime(df_wrf[['day', 'month', 'year', 'hour']]).to_frame()
         df_wrf_dt.columns = ['Date']
+        df_wrf_dt = pd.concat((df_wrf_dt, df_wrf[['month', 'day', 'hour']]), axis = 1)
         df_wrf_n = pd.concat((df_wrf_dt, df_wrf[wrf_list[4:len(wrf_list)]]), axis = 1)
 
 ### merge AMS and WRF data together
 df_merge = df_ams_n.merge(df_wrf_n, left_on='Date', right_on='Date', 
                            suffixes=('_left', '_right'))   
         
-df_merge.to_excel(writer, sheet_name = file[0:15]) # save each AMS to separate worksheet
-writer.save()  # save by year workbook
-writer.close() # close by year workbook
+df_merge.to_excel(writer, sheet_name = file[0:15]) # save to Excel
+writer.save()  # save workbook
+writer.close() # close workbook
 print('\nSaving in file: ' + file_out)
 
 

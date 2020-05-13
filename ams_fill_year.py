@@ -24,6 +24,11 @@ def clean_name(text_list):
         new_text = new_text.replace(',2','')
         new_text = new_text.replace(' conc','')
         new_text = new_text.replace(' Conc','')
+        new_text = new_text.replace('Wind Direction','WD')
+        new_text = new_text.replace('Wind Speed','WS')
+        new_text = new_text.replace('Temperature','TEMP')
+        new_text = new_text.replace('Relative Humidity','RH')
+        new_text = new_text.replace('Pressure','ATP')
         new_list.append(new_text)
     return new_list
 
@@ -38,7 +43,7 @@ def check_file(file_out):
     ### see if file exists and if it does, add a prefix
     if os.path.isfile(file_out):
         file_1 = file_out
-        file_out = '1_' + file_out
+        file_out = '2_' + file_out
         print(file_1 + ' already exists. Saving as ' + file_out)
     return file_out
 
@@ -58,7 +63,7 @@ def save_pollutant(df, analyte):
     df.to_excel(writer, sheet_name = analyte) # save each AMS to separate worksheet
     return
     
-file_list = glob.glob('*.xlsx')
+file_list = glob.glob('AMS 02 - Al Jahra_AMS_Data.xlsx')
 
 file_out = check_file('AMS02_Jahra_by_year.xls')
     
@@ -87,7 +92,7 @@ for file in file_list:
     
     df_aqi = df[parameters].apply(pd.to_numeric)
     
-    df_aqi.CO = df_aqi.CO / 1000 # convert to mg/m3
+    df_aqi.CO = df_aqi.CO * 1000 # convert mg/m3 to ug/m3
     
     df_aqi = pd.concat((df_datetime, df_aqi), axis = 1) # combine date with parameters
     
@@ -95,14 +100,14 @@ for file in file_list:
     
     for this_year in yrs:
         
-        df_year = df_aqi[df_aqi['Date'].dt.year == this_year] ## select onlyu values in the year
+        df_year = df_aqi[df_aqi['Date'].dt.year == this_year] ## select only values in the year
         df_year = df_year.reset_index(drop=True) # reset index for each year
     
         worksheet_name = str(this_year)
         df_year.to_excel(writer, sheet_name = worksheet_name) # save each AMS to separate worksheet
         
         mask = no_leap(df_year)   #make mask to remove leap year hours (if any)
-        df_noleap = df_year[mask] #remove leap year hours
+        df_noleap = df_year#[mask] #remove leap year hours
         df_noleap = df_noleap.reset_index(drop=True)
         
         ##### add column to analytes
@@ -126,12 +131,24 @@ for file in file_list:
             df_col = df_noleap.PM10.to_frame()
             df_col.columns = [str(this_year)]
             df_pm10 = pd.concat((df_pm10, df_col), axis = 1)
+        
+        ### save leap and no-leap year datetimes
+        if this_year == 2019:
+            df_Date = df_noleap.Date.to_frame()
+        if this_year == 2016:
+            df_Date_leap = df_noleap.Date.to_frame()
     
     writer.save()  # save by year workbook
     writer.close() # close by year workbook
+    
+    ##### add DateTime column to each analyte df
+    df_o3 = pd.concat((df_Date, df_o3, df_Date_leap), axis = 1)
+    df_so2 = pd.concat((df_Date, df_so2, df_Date_leap), axis = 1)
+    df_no2 = pd.concat((df_Date, df_no2, df_Date_leap), axis = 1)
+    df_co = pd.concat((df_Date, df_co, df_Date_leap), axis = 1)
+    df_pm10= pd.concat((df_Date, df_pm10, df_Date_leap), axis = 1)
 
 #### save analytes in separate sheets
-
 writer = pd.ExcelWriter(file_pollutants, engine = 'xlsxwriter')
 
 yr_cols = df_aqi['Date'].dt.year.unique().tolist() # get list of years in data
