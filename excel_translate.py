@@ -26,12 +26,7 @@ def translate_sheet(df):
     
     #deal with column names first
     col_names = list(df)
-    '''
-    new_col_names = []
-    for name in col_names:
-         eng_name = translate(name)
-         new_col_names.append(eng_name)
-    '''
+
     #rename columns    
     df.columns = translate_list(col_names)
     
@@ -56,28 +51,45 @@ def translate_sheet(df):
         df.loc[i] = temp_row
     
     return df
-    
+
+##############################################################################
+
+### Start main program
+
+##############################################################################
+
 translator = google_translator() 
 lang_org = 'he' ## Hebrew = 'he'
 
 # load file
 for file in glob.glob("*.xls"):
     
+    eng_file = deepcopy(file.replace('.xls', '')) + '_eng.xlsx'
+    writer = pd.ExcelWriter(eng_file)
     print('\nLoading ' + file + '....\n')
     
-    f = pd.ExcelFile(file)
-    sheet_names = f.parse()
+    # get sheets in each file
+    xls = pd.ExcelFile(file)
+    sheet_names = xls.sheet_names
     
     # translate sheet names for later use
     new_sheet_names = translate_list(sheet_names)
     
-    for sheet in sheet_names:
+    for k in range(len(sheet_names)):
         
-        print('Processing sheet')
+        sheet = sheet_names[k]
+        
+        print('\nProcessing sheet',k, 'of ', len(sheet_names))
     
         df = pd.read_excel(file, sheet_name = sheet)
     
         new_df = translate_sheet(df)
+        
+        #save as new sheet
+        print('\nSaving sheet ' + sheet + ' as ' + new_sheet_names[k])
+        new_df.to_excel(writer, new_sheet_names[k])
+        
+    writer.save()
     
     '''
     #deal with column names first
